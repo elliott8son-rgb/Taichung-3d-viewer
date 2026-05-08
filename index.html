@@ -386,28 +386,28 @@
       name: '片片山閑',
       lat: 24.16943917449622,
       lon: 120.63775022480233,
-      file: 'https://drive.google.com/uc?export=download&id=1Bp5Xgz9qxn5ib6izJfuzW0r816HgfnGk',
+      file: 'https://media.githubusercontent.com/media/elliott8son-rgb/Taichung-3d-viewer/main/%E7%89%87%E7%89%87%E5%B1%B1%E9%96%91.glb',
       height: 0
     },
     {
       name: '花果山',
       lat: 24.175605644851554,
       lon: 120.63628376577066,
-      file: 'https://drive.google.com/uc?export=download&id=15NjXxK-x6WCnqzmnr8j-Ok08k4764ZVW',
+      file: 'https://media.githubusercontent.com/media/elliott8son-rgb/Taichung-3d-viewer/main/%E8%8A%B1%E6%9E%9C%E5%B1%B1.glb',
       height: 0
     },
     {
       name: '山哼歌',
       lat: 24.149539959921963,
       lon: 120.65175920985773,
-      file: 'https://drive.google.com/uc?export=download&id=1odQgHG5kvfiUX6V5RPTIBIRMivfsvSsF',
+      file: 'https://media.githubusercontent.com/media/elliott8son-rgb/Taichung-3d-viewer/main/%E5%B1%B1%E5%93%BC%E6%AD%8C.glb',
       height: 0
     },
     {
       name: '惠國段',
       lat: 24.15876418739627,
       lon: 120.64576708513333,
-      file: 'https://drive.google.com/uc?export=download&id=1OajcHrNLwN6MfXBvSVBU0VRqeeTgnelg',
+      file: 'https://media.githubusercontent.com/media/elliott8son-rgb/Taichung-3d-viewer/main/%E6%83%A0%E5%9C%8B%E6%AE%B5.glb',
       height: 0
     }
   ];
@@ -450,6 +450,12 @@
       tileset.style = new Cesium.Cesium3DTileStyle({
         color: "color('rgba(180, 170, 155, 0.7)')"
       });
+
+      // 修正鄰房高度貼合地面
+      const cartographic = Cesium.Cartographic.fromCartesian(tileset.boundingSphere.center);
+      const surface = Cesium.Cartesian3.fromRadians(cartographic.longitude, cartographic.latitude, 0.0);
+      const translation = Cesium.Cartesian3.subtract(surface, tileset.boundingSphere.center, new Cesium.Cartesian3());
+      tileset.modelMatrix = Cesium.Matrix4.fromTranslation(translation);
     } catch (e) {
       console.warn('鄰房載入失敗：', e);
     }
