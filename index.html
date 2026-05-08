@@ -418,7 +418,7 @@
 
   // 初始化 Cesium
   viewer = new Cesium.Viewer('cesiumContainer', {
-    terrainProvider: new Cesium.EllipsoidTerrainProvider(),
+    terrainProvider: await Cesium.createWorldTerrainAsync(),
     baseLayerPicker: false,
     navigationHelpButton: false,
     sceneModePicker: false,
@@ -513,6 +513,9 @@
 
   // 初始化
   async function init() {
+    // ★ 加入世界地形
+    viewer.terrainProvider = await Cesium.createWorldTerrainAsync();
+    
     await loadNeighborBuildings();
     loadProjectModels();
 
