@@ -465,6 +465,10 @@
       const entity = viewer.entities.add({
         name: p.name,
         position: Cesium.Cartesian3.fromDegrees(p.lon, p.lat, p.height),
+        orientation: Cesium.Transforms.headingPitchRollQuaternion(
+          Cesium.Cartesian3.fromDegrees(p.lon, p.lat, p.height),
+          new Cesium.HeadingPitchRoll(0, 0, Cesium.Math.toRadians(-90))
+        ),
         model: {
           uri: p.file,
           scale: 0.01,           // ★ 公分 → 公尺（÷100）
