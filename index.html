@@ -5,7 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>台中建案 3D 展示平台</title>
 
-  <!-- CesiumJS -->
   <script src="https://cesium.com/downloads/cesiumjs/releases/1.114/Build/Cesium/Cesium.js"></script>
   <link href="https://cesium.com/downloads/cesiumjs/releases/1.114/Build/Cesium/Widgets/widgets.css" rel="stylesheet" />
 
@@ -306,21 +305,18 @@
 
 <div id="cesiumContainer"></div>
 
-<!-- 載入畫面 -->
 <div id="loading">
   <div class="load-title">台中建案</div>
   <div class="load-sub">3D Interactive Viewer</div>
   <div class="load-bar"></div>
 </div>
 
-<!-- 頂部標題 -->
 <div id="header">
   <div class="logo">台中 <span>建案展示</span></div>
   <div class="divider"></div>
   <div class="subtitle">Taichung 3D Property Viewer</div>
 </div>
 
-<!-- 左側建案列表 -->
 <div id="sidebar">
   <div class="section-label">建案列表</div>
 
@@ -349,7 +345,6 @@
   </div>
 </div>
 
-<!-- 右側資訊面板 -->
 <div id="info-panel">
   <div class="panel-header">
     <div class="panel-title" id="panel-title">—</div>
@@ -372,45 +367,48 @@
   <button class="fly-btn" onclick="flyToSelected()">飛往建案位置</button>
 </div>
 
-<!-- 底部提示 -->
 <div id="hint">滑鼠左鍵旋轉 · 右鍵平移 · 滾輪縮放</div>
 
 <script>
   // MapTiler API Key
   const MAPTILER_KEY = 'zhTSUMKAIWqRhSEw5UnD';
 
-  // 停用 Cesium Ion（改用 MapTiler 地形）
+  // 停用 Cesium Ion
   Cesium.Ion.defaultAccessToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiJiMjAyZWZkYi0xYThjLTQwNjUtOGE1NC02MmRmYjFkM2Y2MjQiLCJpZCI6MzU4ODAwLCJpYXQiOjE3NjI3NTM4MTR9.fvdrFApwmT-uwtcPJT96iI5crPgoWLqJNHPnBRqvYvI';
 
-  // 建案資料
+  // 建案資料擴充參數：增加方位角 heading，以及高程微調 zOffset
   const projects = [
     {
       name: '片片山閑',
       lat: 24.16943917449622,
       lon: 120.63775022480233,
       file: 'https://cute-strudel-08fbaf.netlify.app/%E7%89%87%E7%89%87%E5%B1%B1%E9%96%91_compressed.glb',
-      height: 0
+      heading: 0,   // 模型旋轉角度 (可修改)
+      zOffset: 0    // 高程微抬 (公尺)，如果大廳陷下去可以改成 1 或 2
     },
     {
       name: '花果山',
       lat: 24.175605644851554,
       lon: 120.63628376577066,
       file: 'https://cute-strudel-08fbaf.netlify.app/%E8%8A%B1%E6%9E%9C%E5%B1%B1_compressed.glb',
-      height: 0
+      heading: 0,
+      zOffset: 0
     },
     {
       name: '山哼歌',
       lat: 24.149539959921963,
       lon: 120.65175920985773,
       file: 'https://cute-strudel-08fbaf.netlify.app/%E5%B1%B1%E5%93%BC%E6%AD%8C_compressed.glb',
-      height: 0
+      heading: 0,
+      zOffset: 0
     },
     {
       name: '惠國段',
       lat: 24.15876418739627,
       lon: 120.64576708513333,
       file: 'https://cute-strudel-08fbaf.netlify.app/%E6%83%A0%E5%9C%8B%E6%AE%B5_compressed.glb',
-      height: 7
+      heading: 0,  
+      zOffset: 0
     }
   ];
 
@@ -453,31 +451,43 @@
         color: "color('rgba(180, 170, 155, 0.7)')"
       });
 
-
     } catch (e) {
       console.warn('鄰房載入失敗：', e);
     }
   }
 
-  // 載入建案 GLB 模型
+  // 載入建案 GLB 模型 (包含高程與旋轉邏輯修正)
   function loadProjectModels() {
     projects.forEach((p, i) => {
+      
+      const heading = Cesium.Math.toRadians(p.heading);
+      
+      // 注意：如果模型還是躺著，請將 pitch 改為 Cesium.Math.toRadians(90)
+      const pitch = 0; 
+      const roll = 0;
+
+      // 如果有設定 zOffset，就在這裡把基準點抬高
+      const position = Cesium.Cartesian3.fromDegrees(p.lon, p.lat, p.zOffset);
+
       const entity = viewer.entities.add({
         name: p.name,
-        position: Cesium.Cartesian3.fromDegrees(p.lon, p.lat, p.height),
+        position: position,
         orientation: Cesium.Transforms.headingPitchRollQuaternion(
-          Cesium.Cartesian3.fromDegrees(p.lon, p.lat, p.height),
-          new Cesium.HeadingPitchRoll(0, 0, Cesium.Math.toRadians(-90))
+          position,
+          new Cesium.HeadingPitchRoll(heading, pitch, roll)
         ),
         model: {
           uri: p.file,
-          scale: 0.01,           // ★ 公分 → 公尺（÷100）
+          scale: 0.01,
           minimumPixelSize: 64,
           maximumScale: 200000,
           shadows: Cesium.ShadowMode.ENABLED,
           colorBlendMode: Cesium.ColorBlendMode.MIX,
           color: Cesium.Color.WHITE,
-          colorBlendAmount: 0.0
+          colorBlendAmount: 0.0,
+          
+          // 強制基於地表算高度，搭配 zOffset 進行相對位移
+          heightReference: Cesium.HeightReference.RELATIVE_TO_GROUND
         }
       });
       modelEntities.push(entity);
@@ -521,7 +531,7 @@
 
   // 初始化
   async function init() {
-    // MapTiler 地形（台灣本土資料，無流量上限問題）
+    // MapTiler 地形
     viewer.terrainProvider = await Cesium.CesiumTerrainProvider.fromUrl(
       'https://api.maptiler.com/tiles/terrain-quantized-mesh-v2/?key=' + MAPTILER_KEY,
       { requestVertexNormals: true }
