@@ -300,6 +300,95 @@
     .cesium-viewer-fullscreenContainer {
       display: none !important;
     }
+
+    /* ── 開發者調整面板 ── */
+    #dev-panel {
+      position: absolute;
+      bottom: 24px;
+      right: 24px;
+      width: 300px;
+      background: var(--panel-bg);
+      border: 1px solid rgba(201,169,110,0.3);
+      backdrop-filter: blur(16px);
+      z-index: 200;
+      display: none;
+    }
+    #dev-panel .dev-title {
+      padding: 10px 14px;
+      background: rgba(201,169,110,0.1);
+      border-bottom: 1px solid rgba(201,169,110,0.2);
+      font-size: 10px;
+      letter-spacing: 0.3em;
+      color: var(--gold);
+      text-transform: uppercase;
+    }
+    #dev-panel .dev-body { padding: 12px 14px; }
+    #dev-panel .dev-row {
+      display: flex;
+      align-items: center;
+      margin-bottom: 8px;
+      gap: 8px;
+    }
+    #dev-panel .dev-label {
+      width: 90px;
+      color: var(--text-muted);
+      font-size: 11px;
+      flex-shrink: 0;
+    }
+    #dev-panel input[type=range] { flex: 1; accent-color: var(--gold); }
+    #dev-panel .dev-value {
+      width: 55px;
+      text-align: right;
+      color: var(--gold-light);
+      font-family: monospace;
+      font-size: 11px;
+    }
+    #dev-panel .dev-sep {
+      font-size: 9px;
+      letter-spacing: 0.2em;
+      color: var(--gold);
+      text-transform: uppercase;
+      margin: 10px 0 6px;
+      border-top: 1px solid rgba(201,169,110,0.15);
+      padding-top: 8px;
+    }
+    #dev-panel .dev-btn {
+      display: block;
+      width: 100%;
+      padding: 8px;
+      margin-top: 6px;
+      background: transparent;
+      border: 1px solid var(--gold);
+      color: var(--gold);
+      font-size: 10px;
+      letter-spacing: 0.2em;
+      cursor: pointer;
+      text-transform: uppercase;
+    }
+    #dev-panel .dev-btn:hover { background: var(--gold); color: var(--dark); }
+    #dev-panel .dev-output {
+      margin-top: 8px;
+      padding: 8px;
+      background: rgba(0,0,0,0.5);
+      font-family: monospace;
+      font-size: 10px;
+      color: #7fff7f;
+      line-height: 1.8;
+    }
+    #dev-toggle {
+      position: absolute;
+      bottom: 24px;
+      right: 24px;
+      padding: 8px 16px;
+      background: rgba(13,13,13,0.9);
+      border: 1px solid rgba(201,169,110,0.4);
+      color: var(--gold);
+      font-size: 10px;
+      letter-spacing: 0.2em;
+      cursor: pointer;
+      z-index: 201;
+      text-transform: uppercase;
+    }
   </style>
 </head>
 <body>
@@ -375,7 +464,64 @@
 <!-- 底部提示 -->
 <div id="hint">滑鼠左鍵旋轉 · 右鍵平移 · 滾輪縮放</div>
 
-<script>
+<!-- 開發者調整按鈕 -->
+<button id="dev-toggle" onclick="toggleDevPanel()">⚙ 調整</button>
+
+<!-- 開發者調整面板 -->
+<div id="dev-panel">
+  <div class="dev-title">⚙ 開發者調整面板</div>
+  <div class="dev-body">
+    <div class="dev-sep">模型設定（選取建案後生效）</div>
+    <div class="dev-row">
+      <span class="dev-label">高度偏移(m)</span>
+      <input type="range" id="s-height" min="-200" max="200" step="1" value="0" oninput="updateModel()">
+      <span class="dev-value" id="v-height">0</span>
+    </div>
+    <div class="dev-row">
+      <span class="dev-label">旋轉 Heading</span>
+      <input type="range" id="s-heading" min="0" max="360" step="1" value="0" oninput="updateModel()">
+      <span class="dev-value" id="v-heading">0°</span>
+    </div>
+    <div class="dev-row">
+      <span class="dev-label">旋轉 Roll</span>
+      <input type="range" id="s-roll" min="-180" max="180" step="1" value="-90" oninput="updateModel()">
+      <span class="dev-value" id="v-roll">-90°</span>
+    </div>
+    <div class="dev-row">
+      <span class="dev-label">縮放</span>
+      <input type="range" id="s-scale" min="0.001" max="0.05" step="0.001" value="0.01" oninput="updateModel()">
+      <span class="dev-value" id="v-scale">0.01</span>
+    </div>
+    <div class="dev-sep">鏡頭設定</div>
+    <div class="dev-row">
+      <span class="dev-label">鏡頭高度(m)</span>
+      <input type="range" id="s-camh" min="100" max="2000" step="10" value="400" oninput="updateCamera()">
+      <span class="dev-value" id="v-camh">400</span>
+    </div>
+    <div class="dev-row">
+      <span class="dev-label">南北偏移</span>
+      <input type="range" id="s-camlat" min="-0.02" max="0.02" step="0.001" value="-0.006" oninput="updateCamera()">
+      <span class="dev-value" id="v-camlat">-0.006</span>
+    </div>
+    <div class="dev-row">
+      <span class="dev-label">東西偏移</span>
+      <input type="range" id="s-camlon" min="-0.02" max="0.02" step="0.001" value="-0.001" oninput="updateCamera()">
+      <span class="dev-value" id="v-camlon">-0.001</span>
+    </div>
+    <div class="dev-row">
+      <span class="dev-label">俯仰角</span>
+      <input type="range" id="s-pitch" min="-90" max="0" step="1" value="-30" oninput="updateCamera()">
+      <span class="dev-value" id="v-pitch">-30°</span>
+    </div>
+    <div class="dev-row">
+      <span class="dev-label">方位角</span>
+      <input type="range" id="s-camheading" min="0" max="360" step="1" value="30" oninput="updateCamera()">
+      <span class="dev-value" id="v-camheading">30°</span>
+    </div>
+    <button class="dev-btn" onclick="copyValues()">📋 複製目前數值</button>
+    <div class="dev-output" id="dev-output" style="display:none"></div>
+  </div>
+</div>
   // MapTiler API Key
   const MAPTILER_KEY = 'zhTSUMKAIWqRhSEw5UnD';
 
@@ -510,7 +656,7 @@
     const p = projects[selectedIndex];
     // 從建案南方偏西方向看，45度俯角
     viewer.camera.flyTo({
-      destination: Cesium.Cartesian3.fromDegrees(p.lon - 0.002, p.lat - 0.003, 400),
+      destination: Cesium.Cartesian3.fromDegrees(p.lon - 0.001, p.lat - 0.006, 400),
       orientation: {
         heading: Cesium.Math.toRadians(30),
         pitch: Cesium.Math.toRadians(-30),
@@ -548,6 +694,100 @@
       loading.style.opacity = '0';
       setTimeout(() => loading.style.display = 'none', 800);
     }, 1500);
+  }
+
+  // ── 開發者面板 ──
+  function toggleDevPanel() {
+    const panel = document.getElementById('dev-panel');
+    const btn = document.getElementById('dev-toggle');
+    const visible = panel.style.display !== 'none';
+    panel.style.display = visible ? 'none' : 'block';
+    btn.style.display = visible ? 'block' : 'none';
+  }
+
+  function updateModel() {
+    if (selectedIndex < 0) return;
+    const p = projects[selectedIndex];
+    const height  = parseFloat(document.getElementById('s-height').value);
+    const heading = parseFloat(document.getElementById('s-heading').value);
+    const roll    = parseFloat(document.getElementById('s-roll').value);
+    const scale   = parseFloat(document.getElementById('s-scale').value);
+
+    document.getElementById('v-height').textContent  = height;
+    document.getElementById('v-heading').textContent = heading + '°';
+    document.getElementById('v-roll').textContent    = roll + '°';
+    document.getElementById('v-scale').textContent   = scale;
+
+    const entity = modelEntities[selectedIndex];
+    if (!entity) return;
+
+    entity.position = new Cesium.ConstantPositionProperty(
+      Cesium.Cartesian3.fromDegrees(p.lon, p.lat, height)
+    );
+    entity.orientation = new Cesium.ConstantProperty(
+      Cesium.Transforms.headingPitchRollQuaternion(
+        Cesium.Cartesian3.fromDegrees(p.lon, p.lat, height),
+        new Cesium.HeadingPitchRoll(
+          Cesium.Math.toRadians(heading),
+          0,
+          Cesium.Math.toRadians(roll)
+        )
+      )
+    );
+    entity.model.scale = new Cesium.ConstantProperty(scale);
+  }
+
+  function updateCamera() {
+    if (selectedIndex < 0) return;
+    const p = projects[selectedIndex];
+    const camH   = parseFloat(document.getElementById('s-camh').value);
+    const latOff = parseFloat(document.getElementById('s-camlat').value);
+    const lonOff = parseFloat(document.getElementById('s-camlon').value);
+    const pitch  = parseFloat(document.getElementById('s-pitch').value);
+    const heading= parseFloat(document.getElementById('s-camheading').value);
+
+    document.getElementById('v-camh').textContent    = camH;
+    document.getElementById('v-camlat').textContent  = latOff;
+    document.getElementById('v-camlon').textContent  = lonOff;
+    document.getElementById('v-pitch').textContent   = pitch + '°';
+    document.getElementById('v-camheading').textContent = heading + '°';
+
+    viewer.camera.flyTo({
+      destination: Cesium.Cartesian3.fromDegrees(p.lon + lonOff, p.lat + latOff, camH),
+      orientation: {
+        heading: Cesium.Math.toRadians(heading),
+        pitch:   Cesium.Math.toRadians(pitch),
+        roll: 0
+      },
+      duration: 0.5
+    });
+  }
+
+  function copyValues() {
+    const height  = document.getElementById('s-height').value;
+    const heading = document.getElementById('s-heading').value;
+    const roll    = document.getElementById('s-roll').value;
+    const scale   = document.getElementById('s-scale').value;
+    const camH    = document.getElementById('s-camh').value;
+    const latOff  = document.getElementById('s-camlat').value;
+    const lonOff  = document.getElementById('s-camlon').value;
+    const pitch   = document.getElementById('s-pitch').value;
+    const camHd   = document.getElementById('s-camheading').value;
+
+    const name = selectedIndex >= 0 ? projects[selectedIndex].name : '未選取';
+    const text =
+      `【${name}】\n` +
+      `height: ${height}\n` +
+      `heading: ${heading}° | roll: ${roll}°\n` +
+      `scale: ${scale}\n` +
+      `---鏡頭---\n` +
+      `高度: ${camH} | 俯仰: ${pitch}°\n` +
+      `方位: ${camHd}° | lat偏: ${latOff} | lon偏: ${lonOff}`;
+
+    navigator.clipboard.writeText(text).catch(() => {});
+    const out = document.getElementById('dev-output');
+    out.style.display = 'block';
+    out.textContent = text;
   }
 
   init();
