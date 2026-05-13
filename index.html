@@ -9,69 +9,74 @@
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@300;400;600&family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300&display=swap');
     :root {
-      --gold: #C9A96E; --gold-light: #E8D5A3;
-      --dark: #0D0D0D; --text: #F0EBE1;
-      --text-muted: #8A8070; --panel-bg: rgba(13,13,13,0.88);
+      --gold:#C9A96E; --gold-light:#E8D5A3;
+      --dark:#0D0D0D; --text:#F0EBE1;
+      --text-muted:#8A8070; --panel-bg:rgba(13,13,13,0.88);
     }
-    * { margin:0; padding:0; box-sizing:border-box; }
-    html,body { width:100%; height:100%; background:var(--dark); color:var(--text); font-family:'Noto Serif TC',serif; overflow:hidden; }
-    #cesiumContainer { width:100%; height:100%; position:absolute; top:0; left:0; }
+    *{margin:0;padding:0;box-sizing:border-box;}
+    html,body{width:100%;height:100%;background:var(--dark);color:var(--text);font-family:'Noto Serif TC',serif;overflow:hidden;}
+    #cesiumContainer{width:100%;height:100%;position:absolute;top:0;left:0;}
 
-    /* Header */
-    #header { position:absolute; top:0; left:0; right:0; height:64px; background:linear-gradient(180deg,rgba(13,13,13,0.95) 0%,transparent 100%); display:flex; align-items:center; padding:0 32px; z-index:100; pointer-events:none; }
-    #header .logo { font-family:'Cormorant Garamond',serif; font-size:22px; font-weight:300; letter-spacing:0.15em; color:var(--gold-light); }
-    #header .logo span { color:var(--gold); font-style:italic; }
-    #header .divider { width:1px; height:24px; background:var(--gold); opacity:0.4; margin:0 20px; }
-    #header .subtitle { font-size:11px; letter-spacing:0.3em; color:var(--text-muted); text-transform:uppercase; }
+    #header{position:absolute;top:0;left:0;right:0;height:64px;background:linear-gradient(180deg,rgba(13,13,13,0.95) 0%,transparent 100%);display:flex;align-items:center;padding:0 32px;z-index:100;pointer-events:none;}
+    #header .logo{font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:300;letter-spacing:0.15em;color:var(--gold-light);}
+    #header .logo span{color:var(--gold);font-style:italic;}
+    #header .divider{width:1px;height:24px;background:var(--gold);opacity:0.4;margin:0 20px;}
+    #header .subtitle{font-size:11px;letter-spacing:0.3em;color:var(--text-muted);text-transform:uppercase;}
 
-    /* Sidebar */
-    #sidebar { position:absolute; top:80px; left:24px; width:240px; z-index:100; }
-    #sidebar .section-label { font-size:9px; letter-spacing:0.4em; color:var(--gold); text-transform:uppercase; margin-bottom:12px; padding-left:2px; }
-    .project-card { background:var(--panel-bg); border:1px solid rgba(201,169,110,0.15); border-left:2px solid transparent; padding:14px 16px; margin-bottom:8px; cursor:pointer; transition:all 0.3s ease; backdrop-filter:blur(12px); }
-    .project-card:hover,.project-card.active { border-left-color:var(--gold); background:rgba(201,169,110,0.08); }
-    .project-card .name { font-size:14px; color:var(--text); letter-spacing:0.05em; margin-bottom:4px; }
-    .project-card .coords { font-size:10px; color:var(--text-muted); font-family:monospace; }
-    .project-card .tag { display:inline-block; font-size:9px; letter-spacing:0.2em; color:var(--gold); border:1px solid rgba(201,169,110,0.3); padding:2px 6px; margin-top:6px; text-transform:uppercase; }
+    #sidebar{position:absolute;top:80px;left:24px;width:240px;z-index:100;}
+    #sidebar .section-label{font-size:9px;letter-spacing:0.4em;color:var(--gold);text-transform:uppercase;margin-bottom:12px;padding-left:2px;}
+    .project-card{background:var(--panel-bg);border:1px solid rgba(201,169,110,0.15);border-left:2px solid transparent;padding:14px 16px;margin-bottom:8px;cursor:pointer;transition:all 0.3s ease;backdrop-filter:blur(12px);}
+    .project-card:hover,.project-card.active{border-left-color:var(--gold);background:rgba(201,169,110,0.08);}
+    .project-card .name{font-size:14px;color:var(--text);letter-spacing:0.05em;margin-bottom:4px;}
+    .project-card .coords{font-size:10px;color:var(--text-muted);font-family:monospace;}
+    .project-card .tag{display:inline-block;font-size:9px;letter-spacing:0.2em;color:var(--gold);border:1px solid rgba(201,169,110,0.3);padding:2px 6px;margin-top:6px;text-transform:uppercase;}
 
-    /* Info Panel */
-    #info-panel { position:absolute; top:80px; right:24px; width:280px; background:var(--panel-bg); border:1px solid rgba(201,169,110,0.2); backdrop-filter:blur(16px); z-index:100; opacity:0; transform:translateX(20px); transition:all 0.4s ease; pointer-events:none; }
-    #info-panel.visible { opacity:1; transform:translateX(0); pointer-events:all; }
-    #info-panel .panel-header { padding:16px 20px; border-bottom:1px solid rgba(201,169,110,0.15); }
-    #info-panel .panel-title { font-size:18px; color:var(--gold-light); letter-spacing:0.08em; }
-    #info-panel .panel-type { font-size:10px; letter-spacing:0.3em; color:var(--text-muted); text-transform:uppercase; margin-top:4px; }
-    #info-panel .panel-body { padding:16px 20px; }
-    #info-panel .info-row { display:flex; justify-content:space-between; align-items:center; padding:8px 0; border-bottom:1px solid rgba(255,255,255,0.05); }
-    #info-panel .info-label { font-size:11px; color:var(--text-muted); letter-spacing:0.1em; }
-    #info-panel .info-value { font-size:12px; color:var(--text); }
-    #info-panel .fly-btn { display:block; width:calc(100% - 40px); margin:16px 20px; padding:10px; background:transparent; border:1px solid var(--gold); color:var(--gold); font-family:'Noto Serif TC',serif; font-size:11px; letter-spacing:0.3em; text-align:center; cursor:pointer; transition:all 0.3s ease; text-transform:uppercase; }
-    #info-panel .fly-btn:hover { background:var(--gold); color:var(--dark); }
+    #info-panel{position:absolute;top:80px;right:24px;width:280px;background:var(--panel-bg);border:1px solid rgba(201,169,110,0.2);backdrop-filter:blur(16px);z-index:100;opacity:0;transform:translateX(20px);transition:all 0.4s ease;pointer-events:none;}
+    #info-panel.visible{opacity:1;transform:translateX(0);pointer-events:all;}
+    #info-panel .panel-header{padding:16px 20px;border-bottom:1px solid rgba(201,169,110,0.15);}
+    #info-panel .panel-title{font-size:18px;color:var(--gold-light);letter-spacing:0.08em;}
+    #info-panel .panel-type{font-size:10px;letter-spacing:0.3em;color:var(--text-muted);text-transform:uppercase;margin-top:4px;}
+    #info-panel .panel-body{padding:16px 20px;}
+    #info-panel .info-row{display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid rgba(255,255,255,0.05);}
+    #info-panel .info-label{font-size:11px;color:var(--text-muted);letter-spacing:0.1em;}
+    #info-panel .info-value{font-size:12px;color:var(--text);}
+    #info-panel .fly-btn{display:block;width:calc(100% - 40px);margin:16px 20px;padding:10px;background:transparent;border:1px solid var(--gold);color:var(--gold);font-family:'Noto Serif TC',serif;font-size:11px;letter-spacing:0.3em;text-align:center;cursor:pointer;transition:all 0.3s ease;text-transform:uppercase;}
+    #info-panel .fly-btn:hover{background:var(--gold);color:var(--dark);}
 
-    /* Hint */
-    #hint { position:absolute; bottom:70px; left:50%; transform:translateX(-50%); font-size:10px; letter-spacing:0.3em; color:var(--text-muted); text-transform:uppercase; z-index:100; pointer-events:none; }
+    #hint{position:absolute;bottom:70px;left:50%;transform:translateX(-50%);font-size:10px;letter-spacing:0.3em;color:var(--text-muted);text-transform:uppercase;z-index:100;pointer-events:none;}
 
-    /* Loading */
-    #loading { position:absolute; inset:0; background:var(--dark); display:flex; flex-direction:column; align-items:center; justify-content:center; z-index:200; transition:opacity 0.8s ease; }
-    #loading .load-title { font-family:'Cormorant Garamond',serif; font-size:36px; font-weight:300; color:var(--gold-light); letter-spacing:0.2em; margin-bottom:8px; }
-    #loading .load-sub { font-size:10px; letter-spacing:0.5em; color:var(--text-muted); text-transform:uppercase; margin-bottom:48px; }
-    #loading .load-bar { width:200px; height:1px; background:rgba(201,169,110,0.2); position:relative; overflow:hidden; }
-    #loading .load-bar::after { content:''; position:absolute; top:0; left:-100%; width:100%; height:100%; background:var(--gold); animation:loadBar 2s ease-in-out infinite; }
-    @keyframes loadBar { 0%{left:-100%} 100%{left:100%} }
+    #loading{position:absolute;inset:0;background:var(--dark);display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:200;transition:opacity 0.8s ease;}
+    #loading .load-title{font-family:'Cormorant Garamond',serif;font-size:36px;font-weight:300;color:var(--gold-light);letter-spacing:0.2em;margin-bottom:8px;}
+    #loading .load-sub{font-size:10px;letter-spacing:0.5em;color:var(--text-muted);text-transform:uppercase;margin-bottom:48px;}
+    #loading .load-bar{width:200px;height:1px;background:rgba(201,169,110,0.2);position:relative;overflow:hidden;}
+    #loading .load-bar::after{content:'';position:absolute;top:0;left:-100%;width:100%;height:100%;background:var(--gold);animation:loadBar 2s ease-in-out infinite;}
+    @keyframes loadBar{0%{left:-100%}100%{left:100%}}
 
     /* Dev Panel */
-    #dev-toggle { position:absolute; bottom:24px; right:24px; padding:8px 16px; background:rgba(13,13,13,0.9); border:1px solid rgba(201,169,110,0.4); color:var(--gold); font-size:10px; letter-spacing:0.2em; cursor:pointer; z-index:201; text-transform:uppercase; }
-    #dev-panel { position:absolute; bottom:60px; right:24px; width:300px; background:var(--panel-bg); border:1px solid rgba(201,169,110,0.3); backdrop-filter:blur(16px); z-index:200; display:none; max-height:80vh; overflow-y:auto; }
-    #dev-panel .dev-title { padding:10px 14px; background:rgba(201,169,110,0.1); border-bottom:1px solid rgba(201,169,110,0.2); font-size:10px; letter-spacing:0.3em; color:var(--gold); text-transform:uppercase; }
-    #dev-panel .dev-body { padding:12px 14px; }
-    #dev-panel .dev-row { display:flex; align-items:center; margin-bottom:8px; gap:8px; }
-    #dev-panel .dev-label { width:90px; color:var(--text-muted); font-size:11px; flex-shrink:0; }
-    #dev-panel input[type=range] { flex:1; accent-color:var(--gold); }
-    #dev-panel .dev-value { width:55px; text-align:right; color:var(--gold-light); font-family:monospace; font-size:11px; }
-    #dev-panel .dev-sep { font-size:9px; letter-spacing:0.2em; color:var(--gold); text-transform:uppercase; margin:10px 0 6px; border-top:1px solid rgba(201,169,110,0.15); padding-top:8px; }
-    #dev-panel .dev-btn { display:block; width:100%; padding:8px; margin-top:6px; background:transparent; border:1px solid var(--gold); color:var(--gold); font-size:10px; letter-spacing:0.2em; cursor:pointer; text-transform:uppercase; }
-    #dev-panel .dev-btn:hover { background:var(--gold); color:var(--dark); }
-    #dev-panel .dev-output { margin-top:8px; padding:8px; background:rgba(0,0,0,0.5); font-family:monospace; font-size:10px; color:#7fff7f; line-height:1.8; white-space:pre; }
+    #dev-toggle{position:absolute;bottom:24px;right:24px;padding:8px 16px;background:rgba(13,13,13,0.9);border:1px solid rgba(201,169,110,0.4);color:var(--gold);font-size:10px;letter-spacing:0.2em;cursor:pointer;z-index:201;text-transform:uppercase;}
+    #dev-panel{position:absolute;bottom:60px;right:24px;width:320px;background:var(--panel-bg);border:1px solid rgba(201,169,110,0.3);backdrop-filter:blur(16px);z-index:200;display:none;max-height:85vh;overflow-y:auto;}
+    #dev-panel .dev-title{padding:10px 14px;background:rgba(201,169,110,0.1);border-bottom:1px solid rgba(201,169,110,0.2);font-size:10px;letter-spacing:0.3em;color:var(--gold);text-transform:uppercase;}
+    #dev-panel .dev-body{padding:12px 14px;}
+    #dev-panel .dev-row{display:flex;align-items:center;margin-bottom:6px;gap:6px;}
+    #dev-panel .dev-label{width:88px;color:var(--text-muted);font-size:11px;flex-shrink:0;}
+    #dev-panel input[type=range]{flex:1;accent-color:var(--gold);min-width:0;}
+    #dev-panel input[type=number]{
+      width:58px; flex-shrink:0;
+      background:rgba(0,0,0,0.4);
+      border:1px solid rgba(201,169,110,0.3);
+      color:var(--gold-light);
+      font-family:monospace;
+      font-size:11px;
+      padding:2px 4px;
+      text-align:right;
+    }
+    #dev-panel input[type=number]:focus{outline:none;border-color:var(--gold);}
+    #dev-panel .dev-sep{font-size:9px;letter-spacing:0.2em;color:var(--gold);text-transform:uppercase;margin:10px 0 6px;border-top:1px solid rgba(201,169,110,0.15);padding-top:8px;}
+    #dev-panel .dev-btn{display:block;width:100%;padding:8px;margin-top:6px;background:transparent;border:1px solid var(--gold);color:var(--gold);font-size:10px;letter-spacing:0.2em;cursor:pointer;text-transform:uppercase;}
+    #dev-panel .dev-btn:hover{background:var(--gold);color:var(--dark);}
+    #dev-panel .dev-output{margin-top:8px;padding:8px;background:rgba(0,0,0,0.5);font-family:monospace;font-size:10px;color:#7fff7f;line-height:1.8;white-space:pre;}
 
-    .cesium-viewer-toolbar,.cesium-viewer-animationContainer,.cesium-viewer-timelineContainer,.cesium-viewer-bottom,.cesium-viewer-fullscreenContainer { display:none !important; }
+    .cesium-viewer-toolbar,.cesium-viewer-animationContainer,.cesium-viewer-timelineContainer,.cesium-viewer-bottom,.cesium-viewer-fullscreenContainer{display:none !important;}
   </style>
 </head>
 <body>
@@ -93,24 +98,16 @@
 <div id="sidebar">
   <div class="section-label">建案列表</div>
   <div class="project-card" data-index="0" onclick="selectProject(0)">
-    <div class="name">片片山閑</div>
-    <div class="coords">24.1694° N, 120.6378° E</div>
-    <div class="tag">住宅</div>
+    <div class="name">片片山閑</div><div class="coords">24.1694° N, 120.6378° E</div><div class="tag">住宅</div>
   </div>
   <div class="project-card" data-index="1" onclick="selectProject(1)">
-    <div class="name">花果山</div>
-    <div class="coords">24.1756° N, 120.6363° E</div>
-    <div class="tag">住宅</div>
+    <div class="name">花果山</div><div class="coords">24.1756° N, 120.6363° E</div><div class="tag">住宅</div>
   </div>
   <div class="project-card" data-index="2" onclick="selectProject(2)">
-    <div class="name">山哼歌</div>
-    <div class="coords">24.1495° N, 120.6518° E</div>
-    <div class="tag">住宅</div>
+    <div class="name">山哼歌</div><div class="coords">24.1495° N, 120.6518° E</div><div class="tag">住宅</div>
   </div>
   <div class="project-card" data-index="3" onclick="selectProject(3)">
-    <div class="name">惠國段</div>
-    <div class="coords">24.1588° N, 120.6458° E</div>
-    <div class="tag">住宅</div>
+    <div class="name">惠國段</div><div class="coords">24.1588° N, 120.6458° E</div><div class="tag">住宅</div>
   </div>
 </div>
 
@@ -128,23 +125,60 @@
 </div>
 
 <div id="hint">滑鼠左鍵旋轉 · 右鍵平移 · 滾輪縮放</div>
-
 <button id="dev-toggle" onclick="toggleDevPanel()">⚙ 調整</button>
 
 <div id="dev-panel">
   <div class="dev-title">⚙ 開發者調整面板</div>
   <div class="dev-body">
-    <div class="dev-sep">模型設定（先點選建案）</div>
-    <div class="dev-row"><span class="dev-label">高度偏移(m)</span><input type="range" id="s-height" min="-200" max="200" step="1" value="-80" oninput="updateModel()"><span class="dev-value" id="v-height">-80</span></div>
-    <div class="dev-row"><span class="dev-label">旋轉 Heading</span><input type="range" id="s-heading" min="0" max="360" step="1" value="0" oninput="updateModel()"><span class="dev-value" id="v-heading">0°</span></div>
-    <div class="dev-row"><span class="dev-label">旋轉 Roll</span><input type="range" id="s-roll" min="-180" max="180" step="1" value="-90" oninput="updateModel()"><span class="dev-value" id="v-roll">-90°</span></div>
-    <div class="dev-row"><span class="dev-label">縮放</span><input type="range" id="s-scale" min="0.001" max="0.05" step="0.001" value="0.01" oninput="updateModel()"><span class="dev-value" id="v-scale">0.010</span></div>
+
+    <div class="dev-sep">模型位置</div>
+    <div class="dev-row"><span class="dev-label">高度(m)</span>
+      <input type="range" id="s-height" min="-200" max="200" step="1" value="80" oninput="syncNum('height');updateModel()">
+      <input type="number" id="n-height" value="80" step="1" onchange="syncRange('height');updateModel()"></div>
+
+    <div class="dev-row"><span class="dev-label">南北平移</span>
+      <input type="range" id="s-latoff" min="-0.005" max="0.005" step="0.0001" value="0" oninput="syncNum('latoff');updateModel()">
+      <input type="number" id="n-latoff" value="0" step="0.0001" onchange="syncRange('latoff');updateModel()"></div>
+
+    <div class="dev-row"><span class="dev-label">東西平移</span>
+      <input type="range" id="s-lonoff" min="-0.005" max="0.005" step="0.0001" value="0" oninput="syncNum('lonoff');updateModel()">
+      <input type="number" id="n-lonoff" value="0" step="0.0001" onchange="syncRange('lonoff');updateModel()"></div>
+
+    <div class="dev-sep">模型旋轉</div>
+    <div class="dev-row"><span class="dev-label">Heading(°)</span>
+      <input type="range" id="s-heading" min="0" max="360" step="1" value="90" oninput="syncNum('heading');updateModel()">
+      <input type="number" id="n-heading" value="90" step="1" min="0" max="360" onchange="syncRange('heading');updateModel()"></div>
+
+    <div class="dev-row"><span class="dev-label">Roll(°)</span>
+      <input type="range" id="s-roll" min="-180" max="180" step="1" value="0" oninput="syncNum('roll');updateModel()">
+      <input type="number" id="n-roll" value="0" step="1" min="-180" max="180" onchange="syncRange('roll');updateModel()"></div>
+
+    <div class="dev-sep">模型縮放</div>
+    <div class="dev-row"><span class="dev-label">縮放比例</span>
+      <input type="range" id="s-scale" min="0.001" max="0.05" step="0.001" value="0.01" oninput="syncNum('scale');updateModel()">
+      <input type="number" id="n-scale" value="0.01" step="0.001" min="0.001" max="0.05" onchange="syncRange('scale');updateModel()"></div>
+
     <div class="dev-sep">鏡頭設定</div>
-    <div class="dev-row"><span class="dev-label">鏡頭高度(m)</span><input type="range" id="s-camh" min="100" max="2000" step="10" value="400" oninput="updateCamera()"><span class="dev-value" id="v-camh">400</span></div>
-    <div class="dev-row"><span class="dev-label">南北偏移</span><input type="range" id="s-camlat" min="-0.02" max="0.02" step="0.001" value="-0.006" oninput="updateCamera()"><span class="dev-value" id="v-camlat">-0.006</span></div>
-    <div class="dev-row"><span class="dev-label">東西偏移</span><input type="range" id="s-camlon" min="-0.02" max="0.02" step="0.001" value="-0.001" oninput="updateCamera()"><span class="dev-value" id="v-camlon">-0.001</span></div>
-    <div class="dev-row"><span class="dev-label">俯仰角</span><input type="range" id="s-pitch" min="-90" max="0" step="1" value="-30" oninput="updateCamera()"><span class="dev-value" id="v-pitch">-30°</span></div>
-    <div class="dev-row"><span class="dev-label">方位角</span><input type="range" id="s-camheading" min="0" max="360" step="1" value="30" oninput="updateCamera()"><span class="dev-value" id="v-camheading">30°</span></div>
+    <div class="dev-row"><span class="dev-label">鏡頭高度(m)</span>
+      <input type="range" id="s-camh" min="100" max="2000" step="10" value="340" oninput="syncNum('camh');updateCamera()">
+      <input type="number" id="n-camh" value="340" step="10" onchange="syncRange('camh');updateCamera()"></div>
+
+    <div class="dev-row"><span class="dev-label">南北偏移</span>
+      <input type="range" id="s-camlat" min="-0.02" max="0.02" step="0.001" value="0.003" oninput="syncNum('camlat');updateCamera()">
+      <input type="number" id="n-camlat" value="0.003" step="0.001" onchange="syncRange('camlat');updateCamera()"></div>
+
+    <div class="dev-row"><span class="dev-label">東西偏移</span>
+      <input type="range" id="s-camlon" min="-0.02" max="0.02" step="0.001" value="-0.002" oninput="syncNum('camlon');updateCamera()">
+      <input type="number" id="n-camlon" value="-0.002" step="0.001" onchange="syncRange('camlon');updateCamera()"></div>
+
+    <div class="dev-row"><span class="dev-label">俯仰角(°)</span>
+      <input type="range" id="s-pitch" min="-90" max="0" step="1" value="-28" oninput="syncNum('pitch');updateCamera()">
+      <input type="number" id="n-pitch" value="-28" step="1" min="-90" max="0" onchange="syncRange('pitch');updateCamera()"></div>
+
+    <div class="dev-row"><span class="dev-label">方位角(°)</span>
+      <input type="range" id="s-camheading" min="0" max="360" step="1" value="153" oninput="syncNum('camheading');updateCamera()">
+      <input type="number" id="n-camheading" value="153" step="1" min="0" max="360" onchange="syncRange('camheading');updateCamera()"></div>
+
     <button class="dev-btn" onclick="copyValues()">📋 複製目前數值</button>
     <div class="dev-output" id="dev-output" style="display:none"></div>
   </div>
@@ -155,22 +189,25 @@
   Cesium.Ion.defaultAccessToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiJiMjAyZWZkYi0xYThjLTQwNjUtOGE1NC02MmRmYjFkM2Y2MjQiLCJpZCI6MzU4ODAwLCJpYXQiOjE3NjI3NTM4MTR9.fvdrFApwmT-uwtcPJT96iI5crPgoWLqJNHPnBRqvYvI';
 
   const projects = [
-    { name:'片片山閑', lat:24.16943917449622,   lon:120.63775022480233, file:'https://cute-strudel-08fbaf.netlify.app/%E7%89%87%E7%89%87%E5%B1%B1%E9%96%91_compressed.glb', height:0,   camLatOff:-0.006, camLonOff:-0.001, camH:400, camHeading:30, camPitch:-30, modelHeading:0, modelRoll:-90, scale:0.01 },
-    { name:'花果山',   lat:24.175605644851554,  lon:120.63628376577066, file:'https://cute-strudel-08fbaf.netlify.app/%E8%8A%B1%E6%9E%9C%E5%B1%B1_compressed.glb',           height:0,   camLatOff:-0.006, camLonOff:-0.001, camH:400, camHeading:30, camPitch:-30, modelHeading:0, modelRoll:-90, scale:0.01 },
-    { name:'山哼歌',   lat:24.149539959921963,  lon:120.65175920985773, file:'https://cute-strudel-08fbaf.netlify.app/%E5%B1%B1%E5%93%BC%E6%AD%8C_compressed.glb',          height:0,   camLatOff:-0.006, camLonOff:-0.001, camH:400, camHeading:30, camPitch:-30, modelHeading:0, modelRoll:-90, scale:0.01 },
-    { name:'惠國段',   lat:24.15876418739627,   lon:120.64576708513333, file:'https://cute-strudel-08fbaf.netlify.app/%E6%83%A0%E5%9C%8B%E6%AE%B5_compressed.glb',          height:-80, camLatOff:-0.006, camLonOff:-0.001, camH:400, camHeading:30, camPitch:-30, modelHeading:0, modelRoll:-90, scale:0.01 }
+    { name:'片片山閑', lat:24.16943917449622,  lon:120.63775022480233, file:'https://pub-f5b9d08c306649c9bddf608e5b965d1f.r2.dev/%E7%89%87%E7%89%87%E5%B1%B1%E9%96%91_compressed.glb',
+      height:0,  latoff:0, lonoff:0, modelHeading:0,  modelRoll:-90, scale:0.01, camLatOff:-0.006, camLonOff:-0.001, camH:400, camHeading:30,  camPitch:-30 },
+    { name:'花果山',  lat:24.175605644851554, lon:120.63628376577066, file:'https://pub-f5b9d08c306649c9bddf608e5b965d1f.r2.dev/%E8%8A%B1%E6%9E%9C%E5%B1%B1_compressed.glb',
+      height:0,  latoff:0, lonoff:0, modelHeading:0,  modelRoll:-90, scale:0.01, camLatOff:-0.006, camLonOff:-0.001, camH:400, camHeading:30,  camPitch:-30 },
+    { name:'山哼歌',  lat:24.149539959921963, lon:120.65175920985773, file:'https://pub-f5b9d08c306649c9bddf608e5b965d1f.r2.dev/%E5%B1%B1%E5%93%BC%E6%AD%8C_compressed.glb',
+      height:0,  latoff:0, lonoff:0, modelHeading:0,  modelRoll:-90, scale:0.01, camLatOff:-0.006, camLonOff:-0.001, camH:400, camHeading:30,  camPitch:-30 },
+    { name:'惠國段',  lat:24.15876418739627,  lon:120.64576708513333, file:'https://pub-f5b9d08c306649c9bddf608e5b965d1f.r2.dev/%E6%83%A0%E5%9C%8B%E6%AE%B5_compressed.glb',
+      height:80, latoff:0, lonoff:0, modelHeading:90, modelRoll:0,   scale:0.01, camLatOff:0.003,  camLonOff:-0.002, camH:340, camHeading:153, camPitch:-28 }
   ];
 
   let selectedIndex = -1;
   const modelEntities = [];
 
   const viewer = new Cesium.Viewer('cesiumContainer', {
-    terrainProvider: new Cesium.EllipsoidTerrainProvider(),
+    terrainProvider:new Cesium.EllipsoidTerrainProvider(),
     baseLayerPicker:false, navigationHelpButton:false, sceneModePicker:false,
     geocoder:false, homeButton:false, infoBox:false, selectionIndicator:false,
     timeline:false, animation:false, creditContainer:document.createElement('div')
   });
-
   viewer.scene.backgroundColor = Cesium.Color.fromCssColorString('#0D0D0D');
   viewer.scene.skyBox.show = false;
   viewer.scene.sun.show = false;
@@ -186,12 +223,12 @@
   }
 
   function loadProjectModels() {
-    projects.forEach((p, i) => {
+    projects.forEach((p) => {
       const entity = viewer.entities.add({
         name: p.name,
-        position: Cesium.Cartesian3.fromDegrees(p.lon, p.lat, p.height),
+        position: Cesium.Cartesian3.fromDegrees(p.lon + p.lonoff, p.lat + p.latoff, p.height),
         orientation: Cesium.Transforms.headingPitchRollQuaternion(
-          Cesium.Cartesian3.fromDegrees(p.lon, p.lat, p.height),
+          Cesium.Cartesian3.fromDegrees(p.lon + p.lonoff, p.lat + p.latoff, p.height),
           new Cesium.HeadingPitchRoll(Cesium.Math.toRadians(p.modelHeading), 0, Cesium.Math.toRadians(p.modelRoll))
         ),
         model: { uri:p.file, scale:p.scale, minimumPixelSize:64, maximumScale:200000, shadows:Cesium.ShadowMode.ENABLED }
@@ -209,18 +246,37 @@
     document.getElementById('panel-lon').textContent = p.lon.toFixed(6) + '°';
     document.getElementById('info-panel').classList.add('visible');
 
-    // 同步調整面板數值
-    document.getElementById('s-height').value   = p.height;       document.getElementById('v-height').textContent   = p.height;
-    document.getElementById('s-heading').value  = p.modelHeading; document.getElementById('v-heading').textContent  = p.modelHeading + '°';
-    document.getElementById('s-roll').value     = p.modelRoll;    document.getElementById('v-roll').textContent     = p.modelRoll + '°';
-    document.getElementById('s-scale').value    = p.scale;        document.getElementById('v-scale').textContent    = p.scale;
-    document.getElementById('s-camh').value     = p.camH;         document.getElementById('v-camh').textContent     = p.camH;
-    document.getElementById('s-camlat').value   = p.camLatOff;    document.getElementById('v-camlat').textContent   = p.camLatOff;
-    document.getElementById('s-camlon').value   = p.camLonOff;    document.getElementById('v-camlon').textContent    = p.camLonOff;
-    document.getElementById('s-pitch').value    = p.camPitch;     document.getElementById('v-pitch').textContent    = p.camPitch + '°';
-    document.getElementById('s-camheading').value = p.camHeading; document.getElementById('v-camheading').textContent = p.camHeading + '°';
+    // 同步所有滑條和數字框
+    setVal('height',     p.height);
+    setVal('latoff',     p.latoff);
+    setVal('lonoff',     p.lonoff);
+    setVal('heading',    p.modelHeading);
+    setVal('roll',       p.modelRoll);
+    setVal('scale',      p.scale);
+    setVal('camh',       p.camH);
+    setVal('camlat',     p.camLatOff);
+    setVal('camlon',     p.camLonOff);
+    setVal('pitch',      p.camPitch);
+    setVal('camheading', p.camHeading);
 
     flyToSelected();
+  }
+
+  function setVal(id, val) {
+    document.getElementById('s-' + id).value = val;
+    document.getElementById('n-' + id).value = val;
+  }
+
+  function syncNum(id) {
+    document.getElementById('n-' + id).value = document.getElementById('s-' + id).value;
+  }
+
+  function syncRange(id) {
+    document.getElementById('s-' + id).value = document.getElementById('n-' + id).value;
+  }
+
+  function getVal(id) {
+    return parseFloat(document.getElementById('n-' + id).value);
   }
 
   function flyToSelected() {
@@ -233,7 +289,6 @@
     });
   }
 
-  // ── 開發者面板 ──
   function toggleDevPanel() {
     const panel = document.getElementById('dev-panel');
     panel.style.display = panel.style.display === 'none' ? 'block' : 'none';
@@ -242,51 +297,37 @@
   function updateModel() {
     if (selectedIndex < 0) return;
     const p = projects[selectedIndex];
-    const height  = parseFloat(document.getElementById('s-height').value);
-    const heading = parseFloat(document.getElementById('s-heading').value);
-    const roll    = parseFloat(document.getElementById('s-roll').value);
-    const scale   = parseFloat(document.getElementById('s-scale').value);
-
-    document.getElementById('v-height').textContent  = height;
-    document.getElementById('v-heading').textContent = heading + '°';
-    document.getElementById('v-roll').textContent    = roll + '°';
-    document.getElementById('v-scale').textContent   = scale.toFixed(3);
-
-    // 即時更新 projects 資料
-    p.height = height; p.modelHeading = heading; p.modelRoll = roll; p.scale = scale;
+    p.height       = getVal('height');
+    p.latoff       = getVal('latoff');
+    p.lonoff       = getVal('lonoff');
+    p.modelHeading = getVal('heading');
+    p.modelRoll    = getVal('roll');
+    p.scale        = getVal('scale');
 
     const entity = modelEntities[selectedIndex];
     if (!entity) return;
-    entity.position = new Cesium.ConstantPositionProperty(Cesium.Cartesian3.fromDegrees(p.lon, p.lat, height));
+    const pos = Cesium.Cartesian3.fromDegrees(p.lon + p.lonoff, p.lat + p.latoff, p.height);
+    entity.position = new Cesium.ConstantPositionProperty(pos);
     entity.orientation = new Cesium.ConstantProperty(
-      Cesium.Transforms.headingPitchRollQuaternion(
-        Cesium.Cartesian3.fromDegrees(p.lon, p.lat, height),
-        new Cesium.HeadingPitchRoll(Cesium.Math.toRadians(heading), 0, Cesium.Math.toRadians(roll))
+      Cesium.Transforms.headingPitchRollQuaternion(pos,
+        new Cesium.HeadingPitchRoll(Cesium.Math.toRadians(p.modelHeading), 0, Cesium.Math.toRadians(p.modelRoll))
       )
     );
-    entity.model.scale = new Cesium.ConstantProperty(scale);
+    entity.model.scale = new Cesium.ConstantProperty(p.scale);
   }
 
   function updateCamera() {
     if (selectedIndex < 0) return;
     const p = projects[selectedIndex];
-    const camH    = parseFloat(document.getElementById('s-camh').value);
-    const latOff  = parseFloat(document.getElementById('s-camlat').value);
-    const lonOff  = parseFloat(document.getElementById('s-camlon').value);
-    const pitch   = parseFloat(document.getElementById('s-pitch').value);
-    const heading = parseFloat(document.getElementById('s-camheading').value);
-
-    document.getElementById('v-camh').textContent       = camH;
-    document.getElementById('v-camlat').textContent     = latOff;
-    document.getElementById('v-camlon').textContent     = lonOff;
-    document.getElementById('v-pitch').textContent      = pitch + '°';
-    document.getElementById('v-camheading').textContent = heading + '°';
-
-    p.camH = camH; p.camLatOff = latOff; p.camLonOff = lonOff; p.camPitch = pitch; p.camHeading = heading;
+    p.camH       = getVal('camh');
+    p.camLatOff  = getVal('camlat');
+    p.camLonOff  = getVal('camlon');
+    p.camPitch   = getVal('pitch');
+    p.camHeading = getVal('camheading');
 
     viewer.camera.flyTo({
-      destination: Cesium.Cartesian3.fromDegrees(p.lon + lonOff, p.lat + latOff, camH),
-      orientation: { heading:Cesium.Math.toRadians(heading), pitch:Cesium.Math.toRadians(pitch), roll:0 },
+      destination: Cesium.Cartesian3.fromDegrees(p.lon + p.camLonOff, p.lat + p.camLatOff, p.camH),
+      orientation: { heading:Cesium.Math.toRadians(p.camHeading), pitch:Cesium.Math.toRadians(p.camPitch), roll:0 },
       duration: 0.5
     });
   }
@@ -297,12 +338,12 @@
     const text =
       `【${p.name}】\n` +
       `height: ${p.height}  |  scale: ${p.scale}\n` +
+      `latoff: ${p.latoff}  |  lonoff: ${p.lonoff}\n` +
       `modelHeading: ${p.modelHeading}°  |  modelRoll: ${p.modelRoll}°\n` +
       `---鏡頭---\n` +
       `camH: ${p.camH}  |  camPitch: ${p.camPitch}°\n` +
       `camHeading: ${p.camHeading}°\n` +
       `camLatOff: ${p.camLatOff}  |  camLonOff: ${p.camLonOff}`;
-
     navigator.clipboard.writeText(text).catch(()=>{});
     const out = document.getElementById('dev-output');
     out.style.display = 'block';
@@ -316,19 +357,16 @@
         { requestVertexNormals:true }
       );
     } catch(e) {
-      console.warn('MapTiler 地形失敗，使用橢球體：', e);
+      console.warn('MapTiler 失敗：', e);
       viewer.terrainProvider = new Cesium.EllipsoidTerrainProvider();
     }
-
     await loadNeighborBuildings();
     loadProjectModels();
-
     viewer.camera.flyTo({
       destination: Cesium.Cartesian3.fromDegrees(120.645, 24.163, 8000),
       orientation: { heading:Cesium.Math.toRadians(0), pitch:Cesium.Math.toRadians(-45), roll:0 },
       duration: 0
     });
-
     setTimeout(() => {
       const loading = document.getElementById('loading');
       loading.style.opacity = '0';
