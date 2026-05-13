@@ -522,6 +522,8 @@
     <div class="dev-output" id="dev-output" style="display:none"></div>
   </div>
 </div>
+
+<script>
   // MapTiler API Key
   const MAPTILER_KEY = 'zhTSUMKAIWqRhSEw5UnD';
 
@@ -668,11 +670,16 @@
 
   // 初始化
   async function init() {
-    // MapTiler 地形（台灣本土資料，無流量上限問題）
-    viewer.terrainProvider = await Cesium.CesiumTerrainProvider.fromUrl(
-      'https://api.maptiler.com/tiles/terrain-quantized-mesh-v2/?key=' + MAPTILER_KEY,
-      { requestVertexNormals: true }
-    );
+    // MapTiler 地形，失敗時降級為橢球體
+    try {
+      viewer.terrainProvider = await Cesium.CesiumTerrainProvider.fromUrl(
+        'https://api.maptiler.com/tiles/terrain-quantized-mesh-v2/?key=' + MAPTILER_KEY,
+        { requestVertexNormals: true }
+      );
+    } catch (e) {
+      console.warn('MapTiler 地形載入失敗，使用預設橢球體：', e);
+      viewer.terrainProvider = new Cesium.EllipsoidTerrainProvider();
+    }
 
     await loadNeighborBuildings();
     loadProjectModels();
