@@ -132,6 +132,8 @@
   <div class="dev-body">
 
     <div class="dev-sep">模型位置</div>
+    <div class="dev-row"><span class="dev-label">目前緯度</span><span id="d-lat" style="font-family:monospace;font-size:11px;color:var(--gold-light);">—</span></div>
+    <div class="dev-row"><span class="dev-label">目前經度</span><span id="d-lon" style="font-family:monospace;font-size:11px;color:var(--gold-light);">—</span></div>
     <div class="dev-row"><span class="dev-label">高度(m)</span>
       <input type="range" id="s-height" min="-200" max="200" step="1" value="80" oninput="syncNum('height');updateModel()">
       <input type="number" id="n-height" value="80" step="1" onchange="syncRange('height');updateModel()"></div>
@@ -190,11 +192,11 @@
 
   const projects = [
     { name:'片片山閑', lat:24.16943917449622,  lon:120.63775022480233, file:'https://pub-f5b9d08c306649c9bddf608e5b965d1f.r2.dev/%E7%89%87%E7%89%87%E5%B1%B1%E9%96%91_compressed.glb',
-      height:0,  latoff:0, lonoff:0, modelHeading:0,  modelRoll:-90, scale:0.01, camLatOff:-0.006, camLonOff:-0.001, camH:400, camHeading:30,  camPitch:-30 },
+      height:0,  latoff:0, lonoff:0, modelHeading:0,  modelRoll:0, scale:0.01, camLatOff:-0.006, camLonOff:-0.001, camH:400, camHeading:30,  camPitch:-30 },
     { name:'花果山',  lat:24.175605644851554, lon:120.63628376577066, file:'https://pub-f5b9d08c306649c9bddf608e5b965d1f.r2.dev/%E8%8A%B1%E6%9E%9C%E5%B1%B1_compressed.glb',
-      height:0,  latoff:0, lonoff:0, modelHeading:0,  modelRoll:-90, scale:0.01, camLatOff:-0.006, camLonOff:-0.001, camH:400, camHeading:30,  camPitch:-30 },
+      height:0,  latoff:0, lonoff:0, modelHeading:0,  modelRoll:0, scale:0.01, camLatOff:-0.006, camLonOff:-0.001, camH:400, camHeading:30,  camPitch:-30 },
     { name:'山哼歌',  lat:24.149539959921963, lon:120.65175920985773, file:'https://pub-f5b9d08c306649c9bddf608e5b965d1f.r2.dev/%E5%B1%B1%E5%93%BC%E6%AD%8C_compressed.glb',
-      height:0,  latoff:0, lonoff:0, modelHeading:0,  modelRoll:-90, scale:0.01, camLatOff:-0.006, camLonOff:-0.001, camH:400, camHeading:30,  camPitch:-30 },
+      height:0,  latoff:0, lonoff:0, modelHeading:0,  modelRoll:0, scale:0.01, camLatOff:-0.006, camLonOff:-0.001, camH:400, camHeading:30,  camPitch:-30 },
     { name:'惠國段',  lat:24.15876418739627,  lon:120.64576708513333, file:'https://pub-f5b9d08c306649c9bddf608e5b965d1f.r2.dev/%E6%83%A0%E5%9C%8B%E6%AE%B5_compressed.glb',
       height:80, latoff:0, lonoff:0, modelHeading:90, modelRoll:0,   scale:0.01, camLatOff:0.003,  camLonOff:-0.002, camH:340, camHeading:153, camPitch:-28 }
   ];
@@ -260,6 +262,7 @@
     setVal('camheading', p.camHeading);
 
     flyToSelected();
+    updateCoordDisplay();
   }
 
   function setVal(id, val) {
@@ -294,6 +297,15 @@
     panel.style.display = panel.style.display === 'none' ? 'block' : 'none';
   }
 
+  function updateCoordDisplay() {
+    if (selectedIndex < 0) return;
+    const p = projects[selectedIndex];
+    const lat = (p.lat + p.latoff).toFixed(8);
+    const lon = (p.lon + p.lonoff).toFixed(8);
+    document.getElementById('d-lat').textContent = lat + '°';
+    document.getElementById('d-lon').textContent = lon + '°';
+  }
+
   function updateModel() {
     if (selectedIndex < 0) return;
     const p = projects[selectedIndex];
@@ -314,6 +326,7 @@
       )
     );
     entity.model.scale = new Cesium.ConstantProperty(p.scale);
+    updateCoordDisplay();
   }
 
   function updateCamera() {
