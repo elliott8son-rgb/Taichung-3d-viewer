@@ -132,19 +132,21 @@
   <div class="dev-body">
 
     <div class="dev-sep">模型位置</div>
-    <div class="dev-row"><span class="dev-label">目前緯度</span><span id="d-lat" style="font-family:monospace;font-size:11px;color:var(--gold-light);">—</span></div>
-    <div class="dev-row"><span class="dev-label">目前經度</span><span id="d-lon" style="font-family:monospace;font-size:11px;color:var(--gold-light);">—</span></div>
+    <div class="dev-row"><span class="dev-label">基準緯度</span>
+      <input type="number" id="d-lat" value="0" step="0.000001" style="flex:1;background:rgba(0,0,0,0.4);border:1px solid rgba(201,169,110,0.3);color:var(--gold-light);font-family:monospace;font-size:11px;padding:2px 4px;" onchange="updateBaseLat()"></div>
+    <div class="dev-row"><span class="dev-label">基準經度</span>
+      <input type="number" id="d-lon" value="0" step="0.000001" style="flex:1;background:rgba(0,0,0,0.4);border:1px solid rgba(201,169,110,0.3);color:var(--gold-light);font-family:monospace;font-size:11px;padding:2px 4px;" onchange="updateBaseLon()"></div>
     <div class="dev-row"><span class="dev-label">高度(m)</span>
       <input type="range" id="s-height" min="-200" max="200" step="1" value="80" oninput="syncNum('height');updateModel()">
       <input type="number" id="n-height" value="80" step="1" onchange="syncRange('height');updateModel()"></div>
 
     <div class="dev-row"><span class="dev-label">南北平移</span>
-      <input type="range" id="s-latoff" min="-0.005" max="0.005" step="0.0001" value="0" oninput="syncNum('latoff');updateModel()">
-      <input type="number" id="n-latoff" value="0" step="0.0001" onchange="syncRange('latoff');updateModel()"></div>
+      <input type="range" id="s-latoff" min="-0.005" max="0.005" step="0.00001" value="0" oninput="syncNum('latoff');updateModel()">
+      <input type="number" id="n-latoff" value="0" step="0.00001" onchange="syncRange('latoff');updateModel()"></div>
 
     <div class="dev-row"><span class="dev-label">東西平移</span>
-      <input type="range" id="s-lonoff" min="-0.005" max="0.005" step="0.0001" value="0" oninput="syncNum('lonoff');updateModel()">
-      <input type="number" id="n-lonoff" value="0" step="0.0001" onchange="syncRange('lonoff');updateModel()"></div>
+      <input type="range" id="s-lonoff" min="-0.005" max="0.005" step="0.00001" value="0" oninput="syncNum('lonoff');updateModel()">
+      <input type="number" id="n-lonoff" value="0" step="0.00001" onchange="syncRange('lonoff');updateModel()"></div>
 
     <div class="dev-sep">模型旋轉</div>
     <div class="dev-row"><span class="dev-label">Heading(°)</span>
@@ -192,7 +194,7 @@
 
   const projects = [
     { name:'片片山閑', lat:24.16943917449622,  lon:120.63775022480233, file:'https://pub-f5b9d08c306649c9bddf608e5b965d1f.r2.dev/%E7%89%87%E7%89%87%E5%B1%B1%E9%96%91_compressed.glb',
-      height:0,  latoff:0, lonoff:0, modelHeading:0,  modelRoll:0, scale:0.01, camLatOff:-0.006, camLonOff:-0.001, camH:400, camHeading:30,  camPitch:-30 },
+      height:85, latoff:-0.0003, lonoff:-0.0001, modelHeading:36, modelRoll:0, scale:0.01, camLatOff:-0.006, camLonOff:-0.001, camH:400, camHeading:30, camPitch:-30 },
     { name:'花果山',  lat:24.175605644851554, lon:120.63628376577066, file:'https://pub-f5b9d08c306649c9bddf608e5b965d1f.r2.dev/%E8%8A%B1%E6%9E%9C%E5%B1%B1_compressed.glb',
       height:0,  latoff:0, lonoff:0, modelHeading:0,  modelRoll:0, scale:0.01, camLatOff:-0.006, camLonOff:-0.001, camH:400, camHeading:30,  camPitch:-30 },
     { name:'山哼歌',  lat:24.149539959921963, lon:120.65175920985773, file:'https://pub-f5b9d08c306649c9bddf608e5b965d1f.r2.dev/%E5%B1%B1%E5%93%BC%E6%AD%8C_compressed.glb',
@@ -263,6 +265,8 @@
 
     flyToSelected();
     updateCoordDisplay();
+    document.getElementById('d-lat').value = p.lat.toFixed(8);
+    document.getElementById('d-lon').value = p.lon.toFixed(8);
   }
 
   function setVal(id, val) {
@@ -300,10 +304,20 @@
   function updateCoordDisplay() {
     if (selectedIndex < 0) return;
     const p = projects[selectedIndex];
-    const lat = (p.lat + p.latoff).toFixed(8);
-    const lon = (p.lon + p.lonoff).toFixed(8);
-    document.getElementById('d-lat').textContent = lat + '°';
-    document.getElementById('d-lon').textContent = lon + '°';
+    document.getElementById('d-lat').value = p.lat.toFixed(8);
+    document.getElementById('d-lon').value = p.lon.toFixed(8);
+  }
+
+  function updateBaseLat() {
+    if (selectedIndex < 0) return;
+    projects[selectedIndex].lat = parseFloat(document.getElementById('d-lat').value);
+    updateModel();
+  }
+
+  function updateBaseLon() {
+    if (selectedIndex < 0) return;
+    projects[selectedIndex].lon = parseFloat(document.getElementById('d-lon').value);
+    updateModel();
   }
 
   function updateModel() {
